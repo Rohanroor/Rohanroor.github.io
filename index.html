@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soil & Water Conservation - Final Presentation</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-color: #0b0f12;
+            --text-dark: #f8fafc;
+            --text-light: #cbd5e1; /* Main reading text */
+            --text-muted: #94a3b8; /* Secondary details */
+            --accent-clay: #D35400; 
+            --accent-water: #2980b9; 
+            --accent-green: #27AE60; 
+            --accent-soft-green: rgba(39, 174, 96, 0.1);
+            --accent-soft-clay: rgba(211, 84, 0, 0.1);
+            --accent-soft-water: rgba(41, 128, 185, 0.1);
+            --white: #FFFFFF;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.3);
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Lato', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-dark);
+        }
+
+        /* --- SLIDE CONTAINER --- */
+        #deck-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background: #0f1724;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+        }
+
+        /* --- MESH BACKGROUNDS --- */
+        .bg-mesh-1 {
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-color: #0f1724;
+            background-blend-mode: screen;
+        }
+        .bg-mesh-earth {
+            background-image:
+                radial-gradient(at 100% 100%, hsla(28, 46%, 22%, 1) 0, transparent 50%),
+                radial-gradient(at 0% 0%, hsla(34, 18%, 15%, 1) 0, transparent 50%);
+            background-color: #0b1112;
+            background-blend-mode: screen;
+        }
+        .bg-mesh-water {
+            background-image:
+                radial-gradient(at 100% 0%, hsla(200, 50%, 20%, 1) 0, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(210, 40%, 15%, 1) 0, transparent 50%);
+            background-color: #081018;
+            background-blend-mode: screen;
+        }
+        .bg-mesh-green {
+            background-image:
+                radial-gradient(at 100% 100%, hsla(134, 38%, 16%, 1) 0, transparent 50%),
+                radial-gradient(at 0% 0%, hsla(160, 42%, 20%, 1) 0, transparent 50%);
+            background-color: #07120e;
+            background-blend-mode: screen;
+        }
+
+        .run-mesh { animation: meshShift 700ms ease-in-out 1; }
+        @keyframes meshShift {
+            0% { background-position: 0% 0%, 50% 0%, 100% 0%; opacity: 0.98; }
+            50% { background-position: 5% -3%, 52% -4%, 98% 2%; opacity: 1; }
+            100% { background-position: 0% 0%, 50% 0%, 100% 0%; opacity: 0.98; }
+        }
+
+        /* --- SLIDE STYLES --- */
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 50px 70px;
+            opacity: 0; transform: translateX(50px);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; z-index: 10; }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 { font-family: var(--font-serif); font-weight: 700; color: var(--text-dark); }
+        h1 { font-size: 4.5rem; line-height: 1.1; margin-bottom: 1rem; }
+        h2 { font-size: 2.5rem; margin-bottom: 1.5rem; position: relative; display: inline-block; }
+        h2::after {
+            content: ''; position: absolute; bottom: -8px; left: 0;
+            width: 50px; height: 3px; background: var(--accent-green);
+        }
+        
+        p, li { font-size: 1rem; line-height: 1.5; color: var(--text-light); margin-bottom: 0.8rem; }
+        strong { color: var(--white); font-weight: 700; font-size: 1.1rem; }
+
+        /* --- COMPONENTS --- */
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); border-radius: 16px;
+            padding: 30px; box-shadow: var(--shadow-sm);
+        }
+
+        .bento-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 20px; width: 100%; height: 100%;
+        }
+
+        .bento-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 25px;
+            display: flex; flex-direction: column; justify-content: flex-start;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        .bento-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); background: rgba(255,255,255,0.06); }
+        
+        .bento-item h3 { font-size: 1.4rem; margin-bottom: 10px; }
+
+        .icon-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 12px;
+        }
+
+        /* Layouts */
+        .content-split { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; height: 100%; align-items: center; }
+        
+        /* Dense List Styles */
+        .dense-list li {
+            margin-bottom: 20px;
+            border-left: 3px solid rgba(255,255,255,0.1);
+            padding-left: 15px;
+        }
+        .dense-list p { margin-bottom: 0; font-size: 0.95rem; color: var(--text-muted); }
+
+        /* Hero Frame */
+        .hero-frame {
+            position: relative; width: 450px; height: 450px;
+            border: 1px solid rgba(255,255,255,0.2); padding: 15px;
+            background: rgba(255,255,255,0.02); backdrop-filter: blur(2px);
+            transform: rotate(2deg); transition: transform 0.4s ease;
+        }
+        .hero-frame:hover { transform: rotate(0deg) scale(1.02); }
+        .hero-frame-inner { width: 100%; height: 100%; overflow: hidden; position: relative; }
+        .hero-frame-inner img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) saturate(0.9); }
+        .hero-accent-wire {
+            position: absolute; top: 20px; left: 20px; width: 450px; height: 450px;
+            border: 2px solid var(--accent-green); z-index: -1; opacity: 0.6; transform: rotate(-4deg);
+        }
+
+        /* Controls */
+        .controls { position: absolute; bottom: 30px; right: 40px; z-index: 100; display: flex; gap: 15px; }
+        .nav-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--text-light);
+            background: transparent; color: var(--text-light); cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-btn:hover { background: var(--text-light); color: var(--bg-color); }
+        .progress-bar {
+            position: absolute; bottom: 0; left: 0; height: 4px;
+            background: var(--accent-green); width: 0%; transition: width 0.5s ease; z-index: 100;
+        }
+        .slide-counter { position: absolute; bottom: 40px; left: 40px; color: var(--text-light); font-weight: 700; letter-spacing: 2px; }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="deck-container">
+
+        <div class="progress-bar" id="progress"></div>
+        <div class="slide-counter" id="counter">01 / 13</div>
+        <div class="controls">
+            <button class="nav-btn" onclick="prevSlide()"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="nav-btn" onclick="nextSlide()"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <div class="slide bg-mesh-1 active" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <div style="flex: 1; max-width: 600px; z-index: 2;">
+                <p style="text-transform: uppercase; letter-spacing: 4px; font-size: 0.9rem; color: var(--accent-green); margin-bottom: 15px;">
+                    Classroom Presentation
+                </p>
+                <h1>Soil & Water<br>Conservation</h1>
+                <p style="font-size: 1.4rem; margin-top: 20px; max-width: 550px; color: var(--text-light);">
+                    An in-depth analysis of the twin crises facing our planet and the sustainable methodologies required to secure our future.
+                </p>
+                <div style="margin-top: 40px; display: flex; align-items: center; gap: 15px;">
+                    <span style="height: 1px; width: 50px; background: var(--text-light);"></span>
+                    <span style="font-family: var(--font-serif); font-style: italic; color: var(--text-light);">Presented By: Sipra Priyadarshini Nayak</span>
+                </div>
+            </div>
+            <div style="flex: 1; display: flex; justify-content: center; align-items: center; position: relative;">
+                <div class="hero-accent-wire"></div>
+                <div class="hero-frame">
+                    <div class="hero-frame-inner">
+                        <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1470&auto=format&fit=crop" alt="Green Sprout in Soil">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-earth">
+            <h2>Introduction to Resource Management</h2>
+            <div class="content-split">
+                <div>
+                    <p>Conservation is not merely about "saving" nature; it is the active, sustainable management of land and water resources to prevent waste, degradation, and destruction.</p>
+                    <p>These two elements are deeply interconnected: you cannot effectively conserve water without healthy soil, and soil cannot exist without moisture.</p>
+                    <div class="glass-card" style="margin-top: 20px;">
+                        <ul class="dense-list" style="list-style: none;">
+                            <li>
+                                <strong>The Symbiotic Link</strong>
+                                <p>Healthy soil acts as a sponge, filtering and retaining water. In turn, water facilitates the nutrient breakdown that creates fertile soil.</p>
+                            </li>
+                            <li>
+                                <strong>The Existential Threat</strong>
+                                <p>Current rates of degradation threaten the stability of global food systems and the availability of fresh drinking water.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bento-grid" style="grid-template-columns: 1fr; gap: 20px;">
+                    <div class="bento-item" style="flex-direction: row; align-items: flex-start;">
+                        <div class="icon-circle" style="background: var(--accent-soft-clay); color: var(--accent-clay); margin-right: 20px;">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <div>
+                            <h3>Soil Conservation</h3>
+                            <p>Techniques aimed at preventing soil erosion, maintaining fertility, and correcting degradation caused by overuse and chemicals.</p>
+                        </div>
+                    </div>
+                    <div class="bento-item" style="flex-direction: row; align-items: flex-start;">
+                        <div class="icon-circle" style="background: var(--accent-soft-water); color: var(--accent-water); margin-right: 20px;">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <div>
+                            <h3>Water Conservation</h3>
+                            <p>Strategies to manage freshwater sustainably, protect the hydrosphere, and meet current and future human demand.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-earth">
+            <h2>Why Conservation is Critical</h2>
+            <div class="bento-grid">
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-wheat-awn"></i></div>
+                    <h3>Global Food Security</h3>
+                    <p>95% of our food comes from the topsoil. Without conservation, we face declining yields despite a growing population, leading to famine risks.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-recycle"></i></div>
+                    <h3>Ecosystem Services</h3>
+                    <p>Soil and water systems perform trillions of dollars worth of "services" for free: water filtration, waste decomposition, and nutrient cycling.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-frog"></i></div>
+                    <h3>Biodiversity Habitat</h3>
+                    <p>A teaspoon of healthy soil contains more living organisms than there are people on Earth. Conservation protects these microscopic architects of life.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-users"></i></div>
+                    <h3>Economic Stability</h3>
+                    <p>Agriculture employs over 1 billion people globally. Land degradation triggers poverty, migration, and economic instability in rural regions.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-earth">
+            <h2 style="border-color: var(--accent-clay);">Drivers of Soil Degradation</h2>
+            <div class="content-split">
+                <div class="glass-card" style="border-left: 4px solid var(--accent-clay);">
+                    <ul class="dense-list" style="list-style: none;">
+                        <li>
+                            <strong>Deforestation & Vegetation Removal</strong>
+                            <p>Trees anchor soil. When forests are cleared, roots die, and the soil loses its structure, making it easily washable by rain or wind.</p>
+                        </li>
+                        <li>
+                            <strong>Unsustainable Agricultural Practices</strong>
+                            <p>Monocropping (growing the same crop repeatedly) sucks specific nutrients from the ground, while heavy tilling destroys soil structure.</p>
+                        </li>
+                        <li>
+                            <strong>Agrochemical Overuse</strong>
+                            <p>Excessive use of synthetic pesticides and fertilizers kills beneficial soil bacteria and fungi, turning living soil into dead dirt.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="bento-item" style="margin-bottom: 20px;">
+                        <h3><i class="fa-solid fa-wind"></i> Soil Erosion</h3>
+                        <p>The accelerated removal of topsoil. Nature takes 500 years to build 1 inch of topsoil; we can lose it in a single storm due to poor management.</p>
+                    </div>
+                    <div class="bento-item">
+                        <h3><i class="fa-solid fa-cow"></i> Overgrazing</h3>
+                        <p>When livestock eat vegetation faster than it recovers, the soil is exposed to the sun, baking it hard and preventing water infiltration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-earth">
+            <h2 style="border-color: var(--accent-clay);">The Consequences of Inaction</h2>
+            <div class="bento-grid">
+                <div class="bento-item">
+                    <div class="icon-circle" style="color: var(--accent-clay); background: var(--accent-soft-clay);"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <h3>Loss of Fertility</h3>
+                    <p>As organic matter is depleted, the soil loses its ability to hold Nitrogen, Phosphorus, and Potassium. This forces farmers to buy expensive chemical substitutes.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="color: var(--accent-clay); background: var(--accent-soft-clay);"><i class="fa-solid fa-wheat-awn-circle-exclamation"></i></div>
+                    <h3>Declining Crop Yields</h3>
+                    <p>Degraded land produces significantly less food. This yield gap disproportionately affects developing nations, leading to food insecurity.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="color: var(--accent-clay); background: var(--accent-soft-clay);"><i class="fa-solid fa-sun"></i></div>
+                    <h3>Desertification</h3>
+                    <p>The irreversible transformation of fertile land into desert. This process currently affects 168 countries and threatens the livelihoods of 1 billion people.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="color: var(--accent-clay); background: var(--accent-soft-clay);"><i class="fa-solid fa-water"></i></div>
+                    <h3>Increased Flooding & Runoff</h3>
+                    <p>Healthy soil acts as a sponge. Hard, degraded soil forms a crust that repels water, causing flash floods and washing pollutants into rivers.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-water">
+            <h2 style="border-color: var(--accent-water);">Why is Water Becoming Scarce?</h2>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+                <div class="bento-grid" style="grid-template-columns: 1fr; gap: 20px;">
+                    <div class="bento-item" style="flex-direction: row; align-items: flex-start;">
+                        <i class="fa-solid fa-faucet-drip" style="font-size: 1.5rem; color: var(--accent-water); margin-right: 25px; margin-top: 5px;"></i>
+                        <div>
+                            <strong>Groundwater Over-extraction</strong>
+                            <p>We are pumping water from underground aquifers faster than rain can naturally recharge them. This leads to drying wells and land subsidence.</p>
+                        </div>
+                    </div>
+                    <div class="bento-item" style="flex-direction: row; align-items: flex-start;">
+                        <i class="fa-solid fa-industry" style="font-size: 1.5rem; color: var(--accent-water); margin-right: 25px; margin-top: 5px;"></i>
+                        <div>
+                            <strong>Industrial & Agricultural Pollution</strong>
+                            <p>Runoff containing nitrates and heavy metals contaminates freshwater sources, rendering them unsafe for human consumption or farming.</p>
+                        </div>
+                    </div>
+                    <div class="bento-item" style="flex-direction: row; align-items: flex-start;">
+                        <i class="fa-solid fa-cloud-sun-rain" style="font-size: 1.5rem; color: var(--accent-water); margin-right: 25px; margin-top: 5px;"></i>
+                        <div>
+                            <strong>Climate Change Impact</strong>
+                            <p>Rising temperatures increase evaporation rates from reservoirs, while altering weather patterns cause prolonged droughts in previously fertile areas.</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                     <div class="glass-card" style="text-align: center; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                        <i class="fa-solid fa-droplet-slash" style="font-size: 4rem; color: var(--text-light); margin-bottom: 20px;"></i>
+                        <h3>The 1% Reality</h3>
+                        <p style="font-size: 1.1rem; line-height: 1.6;">While Earth is covered in water, 97% is salty and 2% is frozen. Only <strong>1%</strong> is accessible for human use, and we are polluting it rapidly.</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-water">
+            <h2 style="border-color: var(--accent-water);">Impacts of Water Scarcity</h2>
+            <div class="bento-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="glass-card" style="border-left: 4px solid var(--accent-clay);">
+                    <h3><i class="fa-solid fa-plant-wilt" style="margin-right: 10px;"></i> Agricultural Collapse</h3>
+                    <p>Agriculture consumes 70% of global freshwater. Scarcity leads to crop failure, spiking food prices, and famine in vulnerable regions.</p>
+                </div>
+                <div class="glass-card" style="border-left: 4px solid var(--accent-clay);">
+                    <h3><i class="fa-solid fa-glass-water" style="margin-right: 10px;"></i> Health Crisis</h3>
+                    <p>When clean water is scarce, people are forced to use contaminated sources, leading to the spread of waterborne diseases like cholera and typhoid.</p>
+                </div>
+                <div class="glass-card" style="border-left: 4px solid var(--accent-clay);">
+                    <h3><i class="fa-solid fa-handshake-slash" style="margin-right: 10px;"></i> Geopolitical Conflict</h3>
+                    <p>Transboundary rivers become flashpoints. "Water Wars" are predicted to be a major source of future conflict as nations compete for flow.</p>
+                </div>
+                <div class="glass-card" style="border-left: 4px solid var(--accent-clay);">
+                    <h3><i class="fa-solid fa-money-bill-trend-up" style="margin-right: 10px;"></i> Economic Stagnation</h3>
+                    <p>Industries like textiles, energy, and manufacturing rely heavily on water. Shortages force factories to close, increasing unemployment and poverty.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-green">
+            <h2>Soil Conservation Techniques</h2>
+            <div class="content-split">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                    <div class="bento-item">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <i class="fa-solid fa-stairs check-icon"></i>
+                            <h3>Terracing</h3>
+                        </div>
+                        <p><strong>Mechanism:</strong> Cutting steps into steep slopes to reduce the speed of water runoff. This prevents water from gathering enough momentum to wash away topsoil.</p>
+                    </div>
+                    <div class="bento-item">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <i class="fa-solid fa-lines-leaning check-icon"></i>
+                            <h3>Contour Plowing</h3>
+                        </div>
+                        <p><strong>Mechanism:</strong> Plowing across the slope rather than up and down. The furrows act as mini-dams, holding water and soil in place instead of creating channels for erosion.</p>
+                    </div>
+                    <div class="bento-item">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <i class="fa-solid fa-leaf check-icon"></i>
+                            <h3>Mulching</h3>
+                        </div>
+                        <p><strong>Mechanism:</strong> Covering the soil with organic matter (straw, leaves). This retains moisture, suppresses weeds, and adds nutrients back to the soil as it decomposes.</p>
+                    </div>
+                </div>
+                <div style="position: relative; height: 100%;">
+                    <div class="hero-frame" style="width: 100%; height: 100%; transform: rotate(0);">
+                        <div class="hero-frame-inner">
+                            <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1470&auto=format&fit=crop" alt="Terrace Farming">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-green">
+            <h2>Water Conservation Techniques</h2>
+            
+
+[Image of drip irrigation system diagram]
+
+            <div class="bento-grid">
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: var(--accent-soft-green); color: var(--accent-green);"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                    <h3>Rainwater Harvesting</h3>
+                    <p><strong>Concept:</strong> Collecting runoff from rooftops or land surfaces and storing it in tanks or recharging groundwater. It turns a free resource (rain) into a reliable supply.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: var(--accent-soft-green); color: var(--accent-green);"><i class="fa-solid fa-minimize"></i></div>
+                    <h3>Drip Irrigation</h3>
+                    <p><strong>Concept:</strong> Using pipes to deliver water drop-by-drop directly to the plant roots. This prevents evaporation and runoff, increasing water efficiency by up to 80%.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: var(--accent-soft-green); color: var(--accent-green);"><i class="fa-solid fa-dungeon"></i></div>
+                    <h3>Check Dams</h3>
+                    <p><strong>Concept:</strong> Small, low-cost barriers built across small streams. They slow down water flow, allowing it time to seep into the ground and recharge local aquifers.</p>
+                </div>
+                <div class="bento-item">
+                    <div class="icon-circle" style="background: var(--accent-soft-green); color: var(--accent-green);"><i class="fa-solid fa-recycle"></i></div>
+                    <h3>Greywater Recycling</h3>
+                    <p><strong>Concept:</strong> Treating wastewater from sinks and showers (greywater) to be used for non-potable purposes like agriculture, reducing the demand on freshwater.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-green">
+            <h2>Community-Led Initiatives</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 30px auto;">Governments make policies, but conservation happens on the ground. Local communities play a pivotal role in enforcing and practicing sustainable methods.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px;">
+                <div class="glass-card" style="text-align: center;">
+                    <i class="fa-solid fa-people-group" style="font-size: 3rem; color: var(--accent-green); margin-bottom: 20px;"></i>
+                    <h3>Participatory Watershed Mgmt</h3>
+                    <p>Villagers come together to map their water resources, build check dams, and decide on equitable water sharing rules to prevent conflict.</p>
+                </div>
+                <div class="glass-card" style="text-align: center;">
+                    <i class="fa-solid fa-carrot" style="font-size: 3rem; color: var(--accent-green); margin-bottom: 20px;"></i>
+                    <h3>Shift to Organic Farming</h3>
+                    <p>Collectively deciding to ban harmful pesticides in a village protects the local water table and improves long-term soil health for everyone.</p>
+                </div>
+                <div class="glass-card" style="text-align: center;">
+                    <i class="fa-solid fa-tree" style="font-size: 3rem; color: var(--accent-green); margin-bottom: 20px;"></i>
+                    <h3>Social Forestry</h3>
+                    <p>Communities planting trees on common lands and wastelands. This prevents soil erosion, provides fuel/fodder, and improves the microclimate.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-1">
+            <h2>The Role of Policy & Governance</h2>
+            <div class="bento-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="bento-item" style="border-left: 5px solid #F1C40F;">
+                    <h3><i class="fa-solid fa-id-card" style="margin-right: 10px; color: #F1C40F;"></i> Soil Health Card Scheme</h3>
+                    <p>A government initiative that provides farmers with a detailed lab report of their soil's nutrient status. This helps them apply only the specific fertilizers needed, reducing chemical overuse and cost.</p>
+                </div>
+                <div class="bento-item" style="border-left: 5px solid #2ECC71;">
+                    <h3><i class="fa-solid fa-globe" style="margin-right: 10px; color: #2ECC71;"></i> UN SDG 15: Life on Land</h3>
+                    <p>A global commitment to "Protect, restore and promote sustainable use of terrestrial ecosystems." It sets a target to achieve a land-degradation-neutral world by the year 2030.</p>
+                </div>
+                <div class="bento-item" style="grid-column: span 2; border-left: 5px solid #3498DB;">
+                    <h3><i class="fa-solid fa-hand-holding-dollar" style="margin-right: 10px; color: #3498DB;"></i> Subsidies & Employment Programs</h3>
+                    <p>Governments provide financial aid for installing drip irrigation systems. Programs like MGNREGA in India employ millions to build water conservation structures like ponds and check dams.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" style="background: url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1374&auto=format&fit=crop') center/cover no-repeat; justify-content: flex-end;">
+            <div style="background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); position: absolute; top:0; left:0; right:0; bottom:0;"></div>
+            <div style="position: relative; z-index: 2; text-align: center; max-width: 900px; margin: 0 auto; padding-bottom: 50px;">
+                <h2 style="color: white; border-bottom: none; font-size: 3.5rem; line-height: 1.2;">"The Nation that destroys its soil<br>destroys itself."</h2>
+                <p style="color: rgba(255,255,255,0.8); font-size: 1.4rem; margin-top: 20px; font-style: italic;">— Franklin D. Roosevelt</p>
+                
+                <p style="margin-top: 30px; font-size: 1.1rem; color: #ccc;">
+                    Conservation is not a choice; it is a necessity for survival. Every drop saved and every inch of soil protected contributes to the security of future generations.
+                </p>
+
+                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 50px;">
+                    <div class="glass-card" style="padding: 15px 30px; font-weight: bold;">Save Soil</div>
+                    <div class="glass-card" style="padding: 15px 30px; font-weight: bold;">Save Water</div>
+                    <div class="glass-card" style="padding: 15px 30px; background: var(--accent-green); color: white; border: none; font-weight: bold;">Save the Future</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-mesh-1" style="flex-direction: column; align-items: center; text-align: center;">
+            <div style="z-index: 2; max-width: 800px;">
+                <p style="text-transform: uppercase; letter-spacing: 4px; color: var(--accent-green); margin-bottom: 20px;">
+                    End of Presentation
+                </p>
+                <h1>Thank You!</h1>
+                <p style="font-size: 1.5rem; color: var(--text-light); margin-bottom: 40px;">
+                    We have covered the fragility of our soil and the scarcity of our water. The knowledge is now yours, but the responsibility belongs to us all.
+                </p>
+
+                <!-- <div class="glass-card" style="display: inline-block; text-align: left; padding: 40px 60px;">
+                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
+                        Any Questions?
+                    </h3>
+                    <ul style="list-style: none; font-size: 1.1rem;">
+                        <li style="margin-bottom: 15px;">
+                            <i class="fa-solid fa-check-double" style="color: var(--accent-green); margin-right: 15px;"></i>
+                            <strong>Next Step:</strong> Reduce water waste at home today.
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <i class="fa-solid fa-envelope" style="color: var(--accent-water); margin-right: 15px;"></i>
+                            [Insert Email Address]
+                        </li>
+                        <li>
+                            <i class="fa-brands fa-linkedin" style="color: var(--accent-clay); margin-right: 15px;"></i>
+                            [Insert Social Handle]
+                        </li>
+                    </ul>
+                </div> -->
+
+                <div style="margin-top: 50px; opacity: 0.7; font-size: 0.9rem;">
+                    <p>A presentation on 'Soil & Water Conservation' by- Sipra Priyadarshini Nayak</p>
+                </div>
+            </div>
+            
+            <div class="hero-accent-wire" style="width: 600px; height: 600px; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg); opacity: 0.1;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const progressBar = document.getElementById('progress');
+        const counter = document.getElementById('counter');
+        const totalSlides = slides.length;
+
+        // Mesh selector
+        const meshSelectors = '.bg-mesh-1, .bg-mesh-earth, .bg-mesh-water, .bg-mesh-green';
+
+        function triggerMeshOnActiveSlide() {
+            const active = slides[currentSlide];
+            if (!active) return;
+            const meshElements = Array.from(active.querySelectorAll(meshSelectors));
+            // Also check if the slide itself has the mesh class
+            if(active.matches(meshSelectors)) meshElements.push(active);
+
+            meshElements.forEach(el => {
+                el.classList.remove('run-mesh');
+                requestAnimationFrame(() => {
+                    el.classList.add('run-mesh');
+                    const onEnd = (ev) => {
+                        if (ev.animationName === 'meshShift') {
+                            el.classList.remove('run-mesh');
+                            el.removeEventListener('animationend', onEnd);
+                        }
+                    };
+                    el.addEventListener('animationend', onEnd, { passive: true });
+                });
+            });
+        }
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            triggerMeshOnActiveSlide();
+
+            // Update Progress
+            const percentage = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${percentage}%`;
+            
+            // Update Counter
+            counter.innerText = String(currentSlide + 1).padStart(2, '0') + " / " + totalSlides;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+
+</body>
+</html>
