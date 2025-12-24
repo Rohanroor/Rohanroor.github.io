@@ -9,6 +9,15 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
 
+        /* --- COLOR VARIABLES (Psychology Calibrated) --- */
+        :root {
+            --bg-color: #f7f3e8;
+            --primary-color: #e5989b;
+            --accent-color: #ffb5a7;
+            --success-color: #84a98c;
+            --text-color: #6d6875;
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -18,20 +27,66 @@
         body {
             margin: 0;
             height: 100vh;
-            background: #f2e8d5;
+            background: var(--bg-color);
             font-family: 'Fredoka', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background-image: radial-gradient(#e6e1d3 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        /* --- PARTICLE ANIMATION (The Burst) --- */
+        /* --- MUSIC BUTTON STYLES --- */
+        .music-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid rgba(229, 152, 155, 0.3);
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Pulse animation when music is off to encourage clicking */
+        .music-btn.pulse {
+            animation: softPulse 2s infinite;
+        }
+
+        @keyframes softPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(229, 152, 155, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(229, 152, 155, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(229, 152, 155, 0);
+            }
+        }
+
+        /* --- PARTICLE ANIMATION --- */
         .particle {
             position: absolute;
             pointer-events: none;
             z-index: 9999;
-            animation: floatOut 1s ease-out forwards;
+            animation: floatOut 1.2s cubic-bezier(0, .9, .57, 1) forwards;
             user-select: none;
         }
 
@@ -42,12 +97,12 @@
             }
 
             100% {
-                transform: translate(var(--tx), var(--ty)) scale(1.5);
+                transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot));
                 opacity: 0;
             }
         }
 
-        /* --- MAIN CONTAINER --- */
+        /* --- CONTAINER --- */
         .container {
             width: 90%;
             max-width: 450px;
@@ -68,7 +123,7 @@
         .progress {
             height: 6px;
             width: 100%;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(109, 104, 117, 0.1);
             border-radius: 3px;
             overflow: hidden;
         }
@@ -76,8 +131,8 @@
         .progress-bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #ff7e7e, #ffc371);
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         /* --- STACK LOGIC --- */
@@ -95,17 +150,18 @@
             width: 100%;
             height: 100%;
             background: #ffffff;
-            border-radius: 22px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(109, 104, 117, 0.15);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 24px;
             opacity: 0;
             transform: scale(0.9) translateY(20px);
             z-index: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
             will-change: transform;
             cursor: grab;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .slide:active {
@@ -116,35 +172,34 @@
             opacity: 1;
             transform: scale(1) translateY(0);
             z-index: 10;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
         .slide.next {
             opacity: 1;
-            transform: scale(0.95) translateY(10px);
+            transform: scale(0.96) translateY(12px);
             z-index: 5;
-            background: #fdfdfd;
+            background: #fbfbfb;
         }
 
-        /* Fly Animations */
         .slide.fly-right {
-            transition: transform 0.5s ease-out, opacity 0.5s ease-out !important;
-            transform: translate(150%, 50px) rotate(30deg) !important;
+            transition: transform 0.6s ease-out, opacity 0.5s ease-out !important;
+            transform: translate(150%, 60px) rotate(20deg) !important;
             opacity: 0 !important;
         }
 
-        /* CONTENT STYLES */
+        /* --- CONTENT STYLES --- */
         .image-box {
             flex: 1;
-            background: #fafafa;
-            border-radius: 16px;
+            background: #faf9f6;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 25px;
             overflow: hidden;
             pointer-events: none;
+            border: 2px solid rgba(229, 152, 155, 0.1);
         }
 
         .image-box img {
@@ -152,24 +207,26 @@
             max-height: 100%;
             object-fit: contain;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            filter: saturate(0.95) contrast(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         .text {
-            min-height: 70px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 1.3rem;
-            color: #555;
+            font-size: 1.35rem;
+            color: var(--text-color);
             padding: 0 10px;
-            font-weight: 600;
-            line-height: 1.4;
+            font-weight: 500;
+            line-height: 1.5;
             pointer-events: none;
+            letter-spacing: -0.02em;
         }
 
-        /* CARD STYLES */
+        /* --- FINAL CARD STYLES --- */
         .card-container {
             flex: 1;
             display: flex;
@@ -182,9 +239,9 @@
 
         .card {
             background: #fff;
-            border: 2px dashed #ff7e7e;
-            border-radius: 16px;
-            padding: 20px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 18px;
+            padding: 25px;
             width: 100%;
             height: 100%;
             display: flex;
@@ -193,46 +250,49 @@
             align-items: center;
             text-align: center;
             overflow-y: auto;
+            background-image: linear-gradient(#f9f9f9 1px, transparent 1px);
+            background-size: 100% 2rem;
         }
 
         .card-title {
-            font-size: 1.4rem;
-            color: #ff7e7e;
-            margin-bottom: 10px;
-            font-weight: bold;
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .card-message {
-            font-size: 1rem;
-            color: #666;
-            line-height: 1.5;
+            font-size: 1.05rem;
+            color: var(--text-color);
+            line-height: 2rem;
         }
 
         .heart-icon {
-            font-size: 1.6rem;
-            margin: 10px 0;
-            animation: pulse 1.5s infinite;
+            font-size: 2rem;
+            margin: 15px 0;
+            animation: gentlePulse 2s infinite ease-in-out;
+            filter: drop-shadow(0 4px 6px rgba(229, 152, 155, 0.4));
         }
 
         .card-footer {
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: #999;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #b5b5b5;
             font-style: italic;
         }
 
         .highlight {
-            color: #ff7e7e;
-            font-weight: bold;
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
-        @keyframes pulse {
+        @keyframes gentlePulse {
             0% {
                 transform: scale(1);
             }
 
             50% {
-                transform: scale(1.2);
+                transform: scale(1.15);
             }
 
             100% {
@@ -240,7 +300,7 @@
             }
         }
 
-        /* CONTROLS */
+        /* --- CONTROLS --- */
         .controls {
             display: flex;
             justify-content: space-between;
@@ -249,19 +309,20 @@
         }
 
         .btn-circle {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             border: none;
             background: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(109, 104, 117, 0.15);
+            font-size: 1.6rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s, box-shadow 0.2s, background-color 0.3s;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 100;
+            color: var(--text-color);
         }
 
         .btn-circle:active {
@@ -269,22 +330,21 @@
         }
 
         .btn-undo {
-            color: #f5b900;
+            color: #e5b3fe;
         }
 
         .btn-next {
-            color: #ff7e7e;
+            color: var(--primary-color);
         }
 
-        /* The Green Heart Button */
         .btn-next.final {
-            background: #4CAF50;
+            background: var(--success-color);
             color: white;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
-            animation: bounce 2s infinite;
+            box-shadow: 0 10px 25px rgba(132, 169, 140, 0.5);
+            animation: softBounce 2s infinite;
         }
 
-        @keyframes bounce {
+        @keyframes softBounce {
 
             0%,
             20%,
@@ -295,23 +355,25 @@
             }
 
             40% {
-                transform: translateY(-10px);
+                transform: translateY(-8px);
             }
 
             60% {
-                transform: translateY(-5px);
+                transform: translateY(-4px);
             }
         }
 
         .hint {
             position: absolute;
-            bottom: 80px;
+            bottom: 85px;
             width: 100%;
             text-align: center;
-            color: #aaa;
-            font-size: 0.8rem;
+            color: #b5b5b5;
+            font-size: 0.85rem;
             pointer-events: none;
-            opacity: 0.6;
+            opacity: 0.8;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         @media (max-width: 380px) {
@@ -321,13 +383,19 @@
             }
 
             .text {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 
 <body>
+
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="music-btn pulse" id="music-btn" onclick="toggleAudio()">🔇</button>
 
     <div class="container">
 
@@ -339,43 +407,43 @@
 
         <div class="stack-area" id="stackArea">
             <div class="slide">
-                <div class="image-box"><img src="1.png"></div>
+                <div class="image-box"><img src="1.webp"></div>
                 <div class="text">I messed up, and I know you’re upset.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="3.png"></div>
-                <div class="text">Seeing that look on your face broke my heart.</div>
+                <div class="image-box"><img src="3.webp"></div>
+                <div class="text">Knowing that I made you sad broke my heart.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="4.png"></div>
-                <div class="text">I never meant to hurt you.</div>
+                <div class="image-box"><img src="4.webp"></div>
+                <div class="text">I never meant to hurt you. Ever!!!</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="5.png"></div>
+                <div class="image-box"><img src="5.webp"></div>
                 <div class="text">I understand why you needed space.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="6.png"></div>
+                <div class="image-box"><img src="6.webp"></div>
                 <div class="text">Watching you walk away was the hardest part.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="7.png"></div>
-                <div class="text">I stepped back. I stopped chasing.</div>
+                <div class="image-box"><img src="7.webp"></div>
+                <div class="text">I will never step back. I will never stop caring. But I will give you your space</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="8.png"></div>
-                <div class="text">I focused on growing, not holding.</div>
+                <div class="image-box"><img src="8.webp"></div>
+                <div class="text">I will focus on growing, wont hold you back.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="9.png"></div>
+                <div class="image-box"><img src="9.webp"></div>
                 <div class="text">I left something good behind.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="10.png"></div>
+                <div class="image-box"><img src="10.webp"></div>
                 <div class="text">Because caring doesn’t demand anything.</div>
             </div>
             <div class="slide">
-                <div class="image-box"><img src="11.png"></div>
+                <div class="image-box"><img src="11.webp"></div>
                 <div class="text">I miss us. Genuinely.</div>
             </div>
 
@@ -385,14 +453,14 @@
                         <div class="card-title">One last thing…</div>
                         <div class="card-message">
                             I’m not asking you to forget what happened.<br>
-                            I just want you to know that I understand it now.
+                            I just want you to know that I just dont want to loose my friend.
                         </div>
                         <div class="heart-icon">🤍</div>
                         <div class="card-message highlight">
                             If you’re ready someday,<br>
-                            I’d really love another chance.
+                            I’d really love another chance. Hope you will forgive me.
                         </div>
-                        <div class="card-footer">— From someone who truly means it</div>
+                        <div class="card-footer">— From your's bhaluuuu... 🐻</div>
                     </div>
                 </div>
             </div>
@@ -408,6 +476,22 @@
     </div>
 
     <script>
+        /* --- AUDIO LOGIC --- */
+        const audio = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-btn');
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play().catch(error => console.log("Playback failed:", error));
+                musicBtn.textContent = "🔊";
+                musicBtn.classList.remove('pulse'); // Stop pulsing once clicked
+            } else {
+                audio.pause();
+                musicBtn.textContent = "🔇";
+            }
+        }
+
+        /* --- SLIDER LOGIC --- */
         const stackArea = document.getElementById('stackArea');
         const slides = document.querySelectorAll('.slide');
         const progressBar = document.getElementById('progress');
@@ -416,7 +500,7 @@
         let currentIndex = 0;
         let startX = 0, currentX = 0;
         let isDragging = false;
-        const threshold = 100;
+        const threshold = 80;
 
         function updateStack() {
             slides.forEach((slide, index) => {
@@ -436,9 +520,8 @@
             const progress = ((currentIndex + 1) / slides.length) * 100;
             progressBar.style.width = `${progress}%`;
 
-            // Update Button State
             if (currentIndex === slides.length - 1) {
-                actionBtn.textContent = "💚"; // Green Heart Emoji
+                actionBtn.textContent = "💚";
                 actionBtn.classList.add("final");
             } else {
                 actionBtn.textContent = "➜";
@@ -446,17 +529,14 @@
             }
         }
 
-        /* --- THE BURST LOGIC --- */
         function createBurst(e) {
-            // Get button position
             const rect = actionBtn.getBoundingClientRect();
             const center = {
                 x: rect.left + rect.width / 2,
                 y: rect.top + rect.height / 2
             };
 
-            // Create multiple particles
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 25; i++) {
                 createParticle(center.x, center.y);
             }
         }
@@ -464,43 +544,38 @@
         function createParticle(x, y) {
             const particle = document.createElement('div');
             particle.classList.add('particle');
-            // Randomly choose Green or White heart
-            particle.textContent = Math.random() > 0.5 ? '💚' : '🤍';
+            particle.textContent = Math.random() > 0.6 ? '💚' : '🤍';
 
-            // Random destination
             const angle = Math.random() * Math.PI * 2;
-            const velocity = 60 + Math.random() * 100; // Distance
+            const velocity = 80 + Math.random() * 120;
             const tx = Math.cos(angle) * velocity + 'px';
             const ty = Math.sin(angle) * velocity + 'px';
+            const rot = (Math.random() * 100 - 50) + 'deg';
 
             particle.style.setProperty('--tx', tx);
             particle.style.setProperty('--ty', ty);
+            particle.style.setProperty('--rot', rot);
             particle.style.left = x + 'px';
             particle.style.top = y + 'px';
 
-            // Random size
-            const size = 1 + Math.random() * 1.5 + 'rem';
+            const size = 1 + Math.random() * 2 + 'rem';
             particle.style.fontSize = size;
 
             document.body.appendChild(particle);
 
-            // Cleanup
             setTimeout(() => {
                 particle.remove();
-            }, 1000);
+            }, 1200);
         }
 
         function handleAction() {
             if (currentIndex === slides.length - 1) {
-                // If on last slide, Trigger Burst!
                 createBurst();
             } else {
-                // Otherwise go next
                 manualNext();
             }
         }
 
-        /* --- PHYSICS ENGINE (Tinder Style) --- */
         function handleStart(x) {
             if (currentIndex >= slides.length) return;
             startX = x;
@@ -519,8 +594,8 @@
 
             const nextSlide = slides[currentIndex + 1];
             if (nextSlide) {
-                const scale = 0.95 + (Math.min(Math.abs(deltaX), 200) / 5000);
-                nextSlide.style.transform = `scale(${scale}) translateY(10px)`;
+                const scale = 0.96 + (Math.min(Math.abs(deltaX), 200) / 7000);
+                nextSlide.style.transform = `scale(${scale}) translateY(12px)`;
             }
         }
 
@@ -530,11 +605,11 @@
 
             const deltaX = currentX - startX;
             const activeSlide = slides[currentIndex];
-            activeSlide.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+            activeSlide.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease';
 
             if (Math.abs(deltaX) > threshold) {
                 const direction = deltaX > 0 ? 1 : -1;
-                activeSlide.style.transform = `translate(${direction * 150}%, 50px) rotate(${direction * 30}deg)`;
+                activeSlide.style.transform = `translate(${direction * 150}%, 60px) rotate(${direction * 20}deg)`;
                 activeSlide.style.opacity = '0';
 
                 setTimeout(() => {
@@ -547,18 +622,16 @@
                 activeSlide.style.transform = '';
                 const nextSlide = slides[currentIndex + 1];
                 if (nextSlide) {
-                    nextSlide.style.transition = 'transform 0.3s ease';
-                    nextSlide.style.transform = 'scale(0.95) translateY(10px)';
+                    nextSlide.style.transition = 'transform 0.4s ease';
+                    nextSlide.style.transform = 'scale(0.96) translateY(12px)';
                 }
             }
         }
 
-        // Touch Events
         stackArea.addEventListener('touchstart', e => handleStart(e.touches[0].clientX));
         stackArea.addEventListener('touchmove', e => handleMove(e.touches[0].clientX));
         stackArea.addEventListener('touchend', handleEnd);
 
-        // Mouse Events
         stackArea.addEventListener('mousedown', e => handleStart(e.clientX));
         window.addEventListener('mousemove', e => handleMove(e.clientX));
         window.addEventListener('mouseup', handleEnd);
