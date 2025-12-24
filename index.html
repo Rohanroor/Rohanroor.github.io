@@ -3,14 +3,16 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>A Story For You</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>For You</title>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
 
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
         }
 
         body {
@@ -22,28 +24,53 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            /* Prevents scrollbars on body */
         }
 
+        /* --- PARTICLE ANIMATION (The Burst) --- */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 9999;
+            animation: floatOut 1s ease-out forwards;
+            user-select: none;
+        }
+
+        @keyframes floatOut {
+            0% {
+                transform: translate(0, 0) scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* --- MAIN CONTAINER --- */
         .container {
-            width: 92%;
-            max-width: 480px;
-            height: 88vh;
-            background: #ffffff;
-            border-radius: 22px;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
+            width: 90%;
+            max-width: 450px;
+            height: 85vh;
+            max-height: 800px;
             position: relative;
             display: flex;
             flex-direction: column;
         }
 
-        .progress {
-            height: 8px;
+        .progress-wrapper {
             width: 100%;
-            background: #eee;
-            flex-shrink: 0;
-            /* Prevents progress bar from squishing */
+            padding: 0 10px;
+            margin-bottom: 15px;
+            z-index: 100;
+        }
+
+        .progress {
+            height: 6px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
         }
 
         .progress-bar {
@@ -53,84 +80,109 @@
             transition: width 0.3s ease;
         }
 
-        /* SLIDE STYLES */
+        /* --- STACK LOGIC --- */
+        .stack-area {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            perspective: 1000px;
+        }
+
         .slide {
             position: absolute;
-            top: 8px;
-            /* Starts below progress bar */
-            bottom: 70px;
-            /* Ends above buttons */
+            top: 0;
             left: 0;
-            right: 0;
-            opacity: 0;
-            transform: translateX(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 22px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
             padding: 20px;
-            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            z-index: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            will-change: transform;
+            cursor: grab;
+        }
+
+        .slide:active {
+            cursor: grabbing;
         }
 
         .slide.active {
             opacity: 1;
-            transform: translateX(0);
-            pointer-events: auto;
-            z-index: 2;
+            transform: scale(1) translateY(0);
+            z-index: 10;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
-        /* IMAGE STYLES */
+        .slide.next {
+            opacity: 1;
+            transform: scale(0.95) translateY(10px);
+            z-index: 5;
+            background: #fdfdfd;
+        }
+
+        /* Fly Animations */
+        .slide.fly-right {
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out !important;
+            transform: translate(150%, 50px) rotate(30deg) !important;
+            opacity: 0 !important;
+        }
+
+        /* CONTENT STYLES */
         .image-box {
             flex: 1;
-            /* Takes up all available space */
             background: #fafafa;
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             overflow: hidden;
-            /* Ensures image doesn't spill out */
+            pointer-events: none;
         }
 
         .image-box img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            /* Keeps image aspect ratio */
             border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* TEXT STYLES */
         .text {
-            height: 20%;
-            /* Fixed height for text area */
+            min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             color: #555;
             padding: 0 10px;
             font-weight: 600;
+            line-height: 1.4;
+            pointer-events: none;
         }
 
-        /* --- NEW STYLES FOR THE CARD (FINAL SLIDE) --- */
-
-        /* The container for the card */
+        /* CARD STYLES */
         .card-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            pointer-events: none;
         }
 
         .card {
             background: #fff;
             border: 2px dashed #ff7e7e;
-            /* Dashed border looks like a note */
             border-radius: 16px;
             padding: 20px;
             width: 100%;
@@ -140,27 +192,25 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            box-shadow: inset 0 0 20px #fff0f0;
             overflow-y: auto;
-            /* Adds scroll if text is too long */
         }
 
         .card-title {
             font-size: 1.4rem;
             color: #ff7e7e;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-weight: bold;
         }
 
         .card-message {
             font-size: 1rem;
             color: #666;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        .heart {
-            font-size: 1.5rem;
-            margin: 15px 0;
+        .heart-icon {
+            font-size: 1.6rem;
+            margin: 10px 0;
             animation: pulse 1.5s infinite;
         }
 
@@ -190,46 +240,89 @@
             }
         }
 
-        /* NAV BUTTONS */
-        .nav {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
+        /* CONTROLS */
+        .controls {
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
-            z-index: 10;
-            /* Ensures buttons are on top */
+            padding: 20px 0;
+            width: 100%;
         }
 
-        button {
+        .btn-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
             border: none;
-            border-radius: 30px;
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: 600;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, box-shadow 0.2s, background-color 0.3s;
+            z-index: 100;
         }
 
-        button:active {
-            transform: scale(0.95);
+        .btn-circle:active {
+            transform: scale(0.9);
         }
 
-        .prev {
-            background: #ddd;
-            color: #555;
+        .btn-undo {
+            color: #f5b900;
         }
 
-        .next {
-            background: #ff7e7e;
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(255, 126, 126, 0.4);
+        .btn-next {
+            color: #ff7e7e;
         }
 
-        .next.final {
+        /* The Green Heart Button */
+        .btn-next.final {
             background: #4CAF50;
-            box-shadow: 0 4px 14px rgba(76, 175, 80, 0.4);
+            color: white;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.8rem;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 380px) {
+            .container {
+                width: 95%;
+                height: 95vh;
+            }
+
+            .text {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
@@ -238,126 +331,256 @@
 
     <div class="container">
 
-        <div class="progress">
-            <div class="progress-bar" id="progress"></div>
+        <div class="progress-wrapper">
+            <div class="progress">
+                <div class="progress-bar" id="progress"></div>
+            </div>
         </div>
 
-        <div class="slide active">
-            <div class="image-box"><img src="1.png"></div>
-            <div class="text">I messed up, and I know you’re upset.</div>
-        </div>
+        <div class="stack-area" id="stackArea">
+            <div class="slide">
+                <div class="image-box"><img src="1.png"></div>
+                <div class="text">I messed up, and I know you’re upset.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="3.png"></div>
+                <div class="text">Seeing that look on your face broke my heart.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="4.png"></div>
+                <div class="text">I never meant to hurt you.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="5.png"></div>
+                <div class="text">I understand why you needed space.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="6.png"></div>
+                <div class="text">Watching you walk away was the hardest part.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="7.png"></div>
+                <div class="text">I stepped back. I stopped chasing.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="8.png"></div>
+                <div class="text">I focused on growing, not holding.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="9.png"></div>
+                <div class="text">I left something good behind.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="10.png"></div>
+                <div class="text">Because caring doesn’t demand anything.</div>
+            </div>
+            <div class="slide">
+                <div class="image-box"><img src="11.png"></div>
+                <div class="text">I miss us. Genuinely.</div>
+            </div>
 
-        <div class="slide">
-            <div class="image-box"><img src="3.png"></div>
-            <div class="text">Seeing that look on your face broke my heart.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="4.png"></div>
-            <div class="text">I never meant to hurt you.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="5.png"></div>
-            <div class="text">I understand why you needed space.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="6.png"></div>
-            <div class="text">Watching you walk away was the hardest part.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="7.png"></div>
-            <div class="text">I stepped back. I stopped chasing.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="8.png"></div>
-            <div class="text">I focused on growing, not holding.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="9.png"></div>
-            <div class="text">I left something good behind.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="10.png"></div>
-            <div class="text">Because caring doesn’t demand anything.</div>
-        </div>
-
-        <div class="slide">
-            <div class="image-box"><img src="11.png"></div>
-            <div class="text">I miss us. Genuinely.</div>
-        </div>
-
-        <div class="slide">
-            <div class="card-container">
-                <div class="card">
-                    <div class="card-title">One last thing…</div>
-
-                    <div class="card-message">
-                        I’m not asking you to forget what happened.<br>
-                        I just want you to know that I understand it now.
-                        <br><br>
-                        I care about you deeply, and I never want to be
-                        the reason you feel hurt again.
-                    </div>
-
-                    <div class="heart">🤍</div>
-
-                    <div class="card-message highlight">
-                        If you’re ready someday,<br>
-                        I’d really love another chance.
-                    </div>
-
-                    <div class="card-footer">
-                        — From someone who truly means it
+            <div class="slide">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-title">One last thing…</div>
+                        <div class="card-message">
+                            I’m not asking you to forget what happened.<br>
+                            I just want you to know that I understand it now.
+                        </div>
+                        <div class="heart-icon">🤍</div>
+                        <div class="card-message highlight">
+                            If you’re ready someday,<br>
+                            I’d really love another chance.
+                        </div>
+                        <div class="card-footer">— From someone who truly means it</div>
                     </div>
                 </div>
             </div>
-
-            <div class="text"> Take your time. I’ll be right here.
-            </div>
         </div>
 
+        <div class="hint">Swipe or Click</div>
 
-        <div class="nav">
-            <button class="prev" onclick="move(-1)">Back</button>
-            <button class="next" id="nextBtn" onclick="move(1)">Next</button>
+        <div class="controls">
+            <button class="btn-circle btn-undo" onclick="undo()">↺</button>
+            <button class="btn-circle btn-next" id="actionBtn" onclick="handleAction()">➜</button>
         </div>
 
     </div>
 
     <script>
+        const stackArea = document.getElementById('stackArea');
         const slides = document.querySelectorAll('.slide');
-        const progress = document.getElementById('progress');
-        const nextBtn = document.getElementById('nextBtn');
-        let index = 0;
+        const progressBar = document.getElementById('progress');
+        const actionBtn = document.getElementById('actionBtn');
 
-        function update() {
-            slides.forEach(s => s.classList.remove('active'));
-            slides[index].classList.add('active');
-            progress.style.width = ((index + 1) / slides.length) * 100 + "%";
+        let currentIndex = 0;
+        let startX = 0, currentX = 0;
+        let isDragging = false;
+        const threshold = 100;
 
-            if (index === slides.length - 1) {
-                nextBtn.textContent = "Forgive me?";
-                nextBtn.classList.add("final");
+        function updateStack() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'next', 'fly-right');
+                slide.style.transform = '';
+                slide.style.opacity = '';
+
+                if (index === currentIndex) {
+                    slide.classList.add('active');
+                } else if (index === currentIndex + 1) {
+                    slide.classList.add('next');
+                } else if (index < currentIndex) {
+                    slide.style.opacity = 0;
+                }
+            });
+
+            const progress = ((currentIndex + 1) / slides.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Update Button State
+            if (currentIndex === slides.length - 1) {
+                actionBtn.textContent = "💚"; // Green Heart Emoji
+                actionBtn.classList.add("final");
             } else {
-                nextBtn.textContent = "Next";
-                nextBtn.classList.remove("final");
+                actionBtn.textContent = "➜";
+                actionBtn.classList.remove("final");
             }
         }
 
-        function move(step) {
-            index += step;
-            if (index < 0) index = 0;
-            if (index >= slides.length) index = slides.length - 1;
-            update();
+        /* --- THE BURST LOGIC --- */
+        function createBurst(e) {
+            // Get button position
+            const rect = actionBtn.getBoundingClientRect();
+            const center = {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+            };
+
+            // Create multiple particles
+            for (let i = 0; i < 20; i++) {
+                createParticle(center.x, center.y);
+            }
         }
 
-        update();
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            // Randomly choose Green or White heart
+            particle.textContent = Math.random() > 0.5 ? '💚' : '🤍';
+
+            // Random destination
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 60 + Math.random() * 100; // Distance
+            const tx = Math.cos(angle) * velocity + 'px';
+            const ty = Math.sin(angle) * velocity + 'px';
+
+            particle.style.setProperty('--tx', tx);
+            particle.style.setProperty('--ty', ty);
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+
+            // Random size
+            const size = 1 + Math.random() * 1.5 + 'rem';
+            particle.style.fontSize = size;
+
+            document.body.appendChild(particle);
+
+            // Cleanup
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
+        }
+
+        function handleAction() {
+            if (currentIndex === slides.length - 1) {
+                // If on last slide, Trigger Burst!
+                createBurst();
+            } else {
+                // Otherwise go next
+                manualNext();
+            }
+        }
+
+        /* --- PHYSICS ENGINE (Tinder Style) --- */
+        function handleStart(x) {
+            if (currentIndex >= slides.length) return;
+            startX = x;
+            isDragging = true;
+            slides[currentIndex].style.transition = 'none';
+        }
+
+        function handleMove(x) {
+            if (!isDragging) return;
+            currentX = x;
+            const deltaX = currentX - startX;
+            const rotation = deltaX * 0.05;
+
+            const activeSlide = slides[currentIndex];
+            activeSlide.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+
+            const nextSlide = slides[currentIndex + 1];
+            if (nextSlide) {
+                const scale = 0.95 + (Math.min(Math.abs(deltaX), 200) / 5000);
+                nextSlide.style.transform = `scale(${scale}) translateY(10px)`;
+            }
+        }
+
+        function handleEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const deltaX = currentX - startX;
+            const activeSlide = slides[currentIndex];
+            activeSlide.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+
+            if (Math.abs(deltaX) > threshold) {
+                const direction = deltaX > 0 ? 1 : -1;
+                activeSlide.style.transform = `translate(${direction * 150}%, 50px) rotate(${direction * 30}deg)`;
+                activeSlide.style.opacity = '0';
+
+                setTimeout(() => {
+                    currentIndex++;
+                    if (currentIndex >= slides.length) currentIndex = slides.length - 1;
+                    updateStack();
+                }, 300);
+
+            } else {
+                activeSlide.style.transform = '';
+                const nextSlide = slides[currentIndex + 1];
+                if (nextSlide) {
+                    nextSlide.style.transition = 'transform 0.3s ease';
+                    nextSlide.style.transform = 'scale(0.95) translateY(10px)';
+                }
+            }
+        }
+
+        // Touch Events
+        stackArea.addEventListener('touchstart', e => handleStart(e.touches[0].clientX));
+        stackArea.addEventListener('touchmove', e => handleMove(e.touches[0].clientX));
+        stackArea.addEventListener('touchend', handleEnd);
+
+        // Mouse Events
+        stackArea.addEventListener('mousedown', e => handleStart(e.clientX));
+        window.addEventListener('mousemove', e => handleMove(e.clientX));
+        window.addEventListener('mouseup', handleEnd);
+
+        function manualNext() {
+            if (currentIndex >= slides.length - 1) return;
+            const activeSlide = slides[currentIndex];
+            activeSlide.classList.add('fly-right');
+            setTimeout(() => {
+                currentIndex++;
+                updateStack();
+            }, 300);
+        }
+
+        function undo() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateStack();
+            }
+        }
+
+        updateStack();
     </script>
 
 </body>
