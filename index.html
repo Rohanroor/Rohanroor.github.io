@@ -19,9 +19,8 @@
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
             --text-light: #F1F8E9;
-            /* Optimized easing for smoother perceived motion */
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Smooth, stable easing */
+            --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         * {
@@ -51,9 +50,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.6s ease-out;
+            transition: opacity 0.5s ease;
             pointer-events: none;
-            /* Prevents blocking once opacity is 0 */
         }
 
         .spinner {
@@ -71,7 +69,7 @@
             }
         }
 
-        /* --- Typography (Fluid Design) --- */
+        /* --- Typography --- */
         h1,
         h2,
         h3 {
@@ -80,7 +78,6 @@
         }
 
         h1 {
-            /* Clamp: Minimum 2.5rem, Preferred 5vw, Maximum 4.5rem */
             font-size: clamp(2.5rem, 5vw, 4.5rem);
             font-weight: 800;
             letter-spacing: -2px;
@@ -109,7 +106,7 @@
             width: 0%;
             height: 4px;
             background: var(--accent);
-            transition: width 0.8s var(--ease-out-expo) 0.5s;
+            transition: width 0.8s var(--ease-smooth) 0.3s;
         }
 
         .slide.active h2::after {
@@ -143,12 +140,11 @@
             margin-bottom: 15px;
         }
 
-        /* --- Slide Engine (Hardware Accelerated) --- */
+        /* --- STABLE ANIMATION ENGINE --- */
         .slide-container {
             position: relative;
             height: 100vh;
             width: 100vw;
-            perspective: 1000px;
         }
 
         .slide {
@@ -157,26 +153,31 @@
             left: 0;
             width: 100%;
             height: 100%;
+            /* Hidden State */
             opacity: 0;
             visibility: hidden;
-            /* Will-change hints to browser to optimize rendering */
-            will-change: opacity, transform, visibility;
-            transition: opacity 0.8s ease-in-out, visibility 0.8s, transform 1s var(--ease-out-expo);
+            transform: translateY(30px);
+            /* Start slightly down */
+
+            /* Clean Transition: No scaling, just fade and lift */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out, visibility 0.6s;
             overflow: hidden;
             z-index: 1;
         }
 
+        /* When slide is leaving, it just fades out without moving */
         .slide:not(.active) {
-            transform: scale(1.08);
-            /* Slight zoom out effect on exit */
+            transform: translateY(-30px);
+            /* Move up slightly on exit */
             pointer-events: none;
         }
 
+        /* Active State */
         .slide.active {
             opacity: 1;
             visibility: visible;
-            transform: scale(1);
-            z-index: 2;
+            transform: translateY(0);
+            z-index: 10;
         }
 
         .slide-bg {
@@ -188,13 +189,7 @@
             background-size: cover;
             background-position: center;
             z-index: -2;
-            transform: scale(1.1);
-            transition: transform 12s linear;
-            will-change: transform;
-        }
-
-        .slide.active .slide-bg {
-            transform: scale(1.0);
+            /* Static background for performance, no zoom animation */
         }
 
         .slide-overlay {
@@ -203,13 +198,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Optimized gradient for readability */
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.75) 50%, rgba(0, 0, 0, 0.92) 100%);
             z-index: -1;
-            backdrop-filter: blur(3px);
+            /* Removed backdrop-filter from animation path to fix glitch */
         }
 
-        /* --- Layouts & Responsive Grid --- */
+        /* --- Layouts --- */
         .slide-content {
             position: relative;
             z-index: 2;
@@ -224,6 +218,7 @@
 
         .hero-layout {
             align-items: flex-start;
+            justify-content: center;
         }
 
         .split-layout {
@@ -236,20 +231,15 @@
 
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             padding: clamp(1.5rem, 3vw, 3rem);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s var(--ease-out-expo);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            /* Scroll handling */
             max-height: 85vh;
-            /* Prevent overflow on small screens */
             overflow-y: auto;
-            /* Scroll internal content if needed */
-            /* Hide Scrollbar for cleaner look */
             scrollbar-width: none;
         }
 
@@ -257,32 +247,32 @@
             display: none;
         }
 
-        /* --- Animations --- */
+        /* --- Internal Stagger Animations --- */
         .animate-up {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease, transform 1s var(--ease-out-expo);
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
         }
 
-        .slide.active .animate-up,
-        .slide.active .glass-panel {
+        .slide.active .animate-up {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .delay-1 {
+        /* Delays */
+        .slide.active .delay-1 {
             transition-delay: 0.1s;
         }
 
-        .delay-2 {
+        .slide.active .delay-2 {
             transition-delay: 0.2s;
         }
 
-        .delay-3 {
+        .slide.active .delay-3 {
             transition-delay: 0.3s;
         }
 
-        .delay-4 {
+        .slide.active .delay-4 {
             transition-delay: 0.4s;
         }
 
@@ -301,45 +291,45 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-left: 4px solid var(--primary);
             opacity: 0;
-            transform: scale(0.9) translateY(30px);
-            transition: all 0.6s var(--ease-spring);
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
         }
 
         .slide.active .bento-box {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: translateY(0);
         }
 
-        /* Stagger Logic */
+        /* Manual Stagger for Grid */
         .slide.active .bento-box:nth-child(1) {
-            transition-delay: 0.2s;
+            transition-delay: 0.1s;
         }
 
         .slide.active .bento-box:nth-child(2) {
-            transition-delay: 0.3s;
+            transition-delay: 0.2s;
         }
 
         .slide.active .bento-box:nth-child(3) {
-            transition-delay: 0.4s;
+            transition-delay: 0.3s;
         }
 
         .slide.active .bento-box:nth-child(4) {
-            transition-delay: 0.5s;
+            transition-delay: 0.4s;
         }
 
         .slide.active .bento-box:nth-child(5) {
-            transition-delay: 0.6s;
+            transition-delay: 0.5s;
         }
 
         .slide.active .bento-box:nth-child(6) {
-            transition-delay: 0.7s;
+            transition-delay: 0.6s;
         }
 
         .bento-box:hover {
-            transform: translateY(-8px) scale(1.02) !important;
             background: rgba(46, 125, 50, 0.3);
             border-color: rgba(255, 255, 255, 0.4);
-            transition-delay: 0s !important;
+            transform: translateY(-5px);
+            transition-duration: 0.2s;
         }
 
         .bento-box strong {
@@ -357,7 +347,7 @@
             line-height: 1.4;
         }
 
-        /* --- App Features Grid --- */
+        /* --- App Features --- */
         .app-features-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -416,13 +406,12 @@
             max-width: 100%;
             border-radius: 30px;
             border: 6px solid #1a1a1a;
-            box-shadow: 0 0 50px rgba(46, 125, 50, 0.3);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
             transition: transform 0.5s ease;
         }
 
         .phone-mockup:hover img {
             transform: scale(1.02);
-            box-shadow: 0 0 70px rgba(46, 125, 50, 0.5);
         }
 
         /* --- Components --- */
@@ -484,7 +473,7 @@
             height: 100%;
             background: var(--accent);
             width: 0%;
-            transition: width 0.8s var(--ease-out-expo);
+            transition: width 0.6s ease-out;
         }
 
         .nav-controls {
@@ -505,20 +494,17 @@
             height: 60px;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Disable user select to prevent highlighting */
             user-select: none;
-            -webkit-user-select: none;
         }
 
         .nav-btn:hover {
             background: var(--primary);
             border-color: var(--primary);
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(46, 125, 50, 0.6);
+            transform: scale(1.05);
         }
 
         .nav-btn:active {
@@ -530,11 +516,7 @@
             fill: currentColor;
         }
 
-        /* =========================================
-           RESPONSIVE MEDIA QUERIES
-           ========================================= */
-
-        /* Tablets and below (max-width: 1024px) */
+        /* --- Responsive --- */
         @media (max-width: 1024px) {
             .slide-content {
                 padding: 0 3rem;
@@ -553,7 +535,6 @@
             }
         }
 
-        /* Mobile Devices (max-width: 768px) */
         @media (max-width: 768px) {
             .slide-content {
                 padding: 4rem 1.5rem;
@@ -566,15 +547,13 @@
                 flex-direction: column;
                 gap: 2rem;
                 padding-bottom: 100px;
-                /* Space for nav buttons */
             }
 
-            /* Make glass panels allow scrolling internally if needed, or wrap content */
             .glass-panel {
                 padding: 1.5rem;
                 max-height: none;
                 width: 100%;
-                transform: translateY(20px);
+                transform: translateY(0);
             }
 
             .bento-grid {
@@ -587,7 +566,6 @@
                 grid-template-columns: 1fr;
             }
 
-            /* Fix Phone Mockup on Mobile */
             .phone-mockup {
                 order: -1;
                 margin-bottom: 20px;
@@ -599,7 +577,6 @@
                 border-width: 4px;
             }
 
-            /* Navigation Adjustments */
             .nav-controls {
                 bottom: 20px;
                 right: 20px;
@@ -649,8 +626,7 @@
                 style="background-image: url('https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
-            <div class="slide-content hero-layout" style="justify-content: center;">
+            <div class="slide-content hero-layout">
                 <div class="hero-badge animate-up">PROJECT PROPOSAL</div>
                 <h1 class="animate-up delay-1">Kishan Sahyog</h1>
                 <h3 class="animate-up delay-2"
@@ -673,7 +649,6 @@
                 style="background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
             <div class="slide-content split-layout">
                 <div class="glass-panel">
                     <h2>Market Context</h2>
@@ -684,34 +659,27 @@
                             <svg class="icon" viewBox="0 0 24 24">
                                 <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
                             </svg>
-                            <div class="list-content">
-                                <strong>Climate & Resource Variability</strong>
-                                <span>Unpredictable weather patterns and water scarcity impacting yields.</span>
-                            </div>
+                            <div class="list-content"><strong>Climate & Resource Variability</strong><span>Unpredictable
+                                    weather patterns and water scarcity impacting yields.</span></div>
                         </div>
                         <div class="list-item">
                             <svg class="icon" viewBox="0 0 24 24">
                                 <line x1="12" y1="1" x2="12" y2="23"></line>
                                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                             </svg>
-                            <div class="list-content">
-                                <strong>Economic Instability</strong>
-                                <span>Limited access to fair market channels leads to income volatility.</span>
-                            </div>
+                            <div class="list-content"><strong>Economic Instability</strong><span>Limited access to fair
+                                    market channels leads to income volatility.</span></div>
                         </div>
                         <div class="list-item">
                             <svg class="icon" viewBox="0 0 24 24">
                                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
-                            <div class="list-content">
-                                <strong>Technological Gap</strong>
-                                <span>High demand for data-driven productivity tools that remain inaccessible.</span>
-                            </div>
+                            <div class="list-content"><strong>Technological Gap</strong><span>High demand for
+                                    data-driven productivity tools that remain inaccessible.</span></div>
                         </div>
                     </div>
                 </div>
-                <div class="spacer"></div>
             </div>
         </div>
 
@@ -720,7 +688,6 @@
                 style="background-image: url('https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
             <div class="slide-content">
                 <div class="glass-panel" style="text-align: center; max-width: 900px; margin: 0 auto;">
                     <h2>The Ecosystem</h2>
@@ -736,16 +703,16 @@
                                     d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                                 </path>
                             </svg>
-                            <h4 style="color:white; margin-bottom: 5px;">Precision Ag</h4>
-                            <small style="color:#ccc;">IoT Sensor Integration</small>
+                            <h4 style="color:white; margin-bottom: 5px;">Precision Ag</h4><small style="color:#ccc;">IoT
+                                Sensor Integration</small>
                         </div>
                         <div class="animate-up delay-3" style="text-align: center; min-width: 150px;">
                             <svg class="icon-large" viewBox="0 0 24 24">
                                 <path d="M12 2.69l5.74 5.88-5.74 5.88-5.74-5.88z"></path>
                                 <path d="M2 22h20"></path>
                             </svg>
-                            <h4 style="color:white; margin-bottom: 5px;">Crop Health</h4>
-                            <small style="color:#ccc;">Deep Learning Analysis</small>
+                            <h4 style="color:white; margin-bottom: 5px;">Crop Health</h4><small style="color:#ccc;">Deep
+                                Learning Analysis</small>
                         </div>
                         <div class="animate-up delay-4" style="text-align: center; min-width: 150px;">
                             <svg class="icon-large" viewBox="0 0 24 24">
@@ -754,8 +721,8 @@
                                 <circle cx="5.5" cy="18.5" r="2.5"></circle>
                                 <circle cx="18.5" cy="18.5" r="2.5"></circle>
                             </svg>
-                            <h4 style="color:white; margin-bottom: 5px;">Supply Chain</h4>
-                            <small style="color:#ccc;">Direct Market Linkage</small>
+                            <h4 style="color:white; margin-bottom: 5px;">Supply Chain</h4><small
+                                style="color:#ccc;">Direct Market Linkage</small>
                         </div>
                     </div>
                 </div>
@@ -767,7 +734,6 @@
                 style="background-image: url('https://images.unsplash.com/photo-1628352081506-83c43123ed6d?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
             <div class="slide-content">
                 <h2 class="animate-up">Key Objectives</h2>
                 <div class="bento-grid">
@@ -798,7 +764,6 @@
                 style="background-image: url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
             <div class="slide-content split-layout">
                 <div class="glass-panel animate-up">
                     <h2>Methodology</h2>
@@ -841,7 +806,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="spacer"></div>
             </div>
         </div>
 
@@ -850,7 +814,6 @@
                 style="background-image: url('https://images.unsplash.com/photo-1595123550441-d377e017de6a?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
             <div class="slide-content split-layout">
                 <div class="glass-panel animate-up">
                     <h2>SmartKrishi Connect</h2>
@@ -918,7 +881,6 @@
                 style="background-image: url('https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
             <div class="slide-content">
                 <h2 style="text-align: center;" class="animate-up">Prototype Findings</h2>
                 <div class="bento-grid" style="grid-template-columns: repeat(2, 1fr);">
@@ -953,40 +915,30 @@
                 style="background-image: url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1920&auto=format&fit=crop');">
             </div>
             <div class="slide-overlay"></div>
-
-            <div class="slide-content hero-layout"
-                style="align-items: center; text-align: center; justify-content: center;">
+            <div class="slide-content hero-layout" style="align-items: center; text-align: center;">
                 <h1 class="animate-up">Future Ready</h1>
                 <div class="glass-panel animate-up delay-2" style="max-width: 800px;">
                     <p><strong>Kishan Sahyog</strong> is not merely a platform; it is a scalable, technological
                         intervention designed to empower rural communities.</p>
                     <div style="display: flex; justify-content: center; gap: 30px; margin-top: 20px; flex-wrap: wrap;">
-                        <span style="display: flex; align-items: center; color: var(--accent); font-weight: 600;">
-                            <svg class="icon" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 24 24">
+                        <span style="display: flex; align-items: center; color: var(--accent); font-weight: 600;"><svg
+                                class="icon" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 24 24">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            </svg>
-                            Food Security
-                        </span>
-                        <span style="display: flex; align-items: center; color: var(--accent); font-weight: 600;">
-                            <svg class="icon" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 24 24">
+                            </svg> Food Security</span>
+                        <span style="display: flex; align-items: center; color: var(--accent); font-weight: 600;"><svg
+                                class="icon" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 24 24">
                                 <path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"></path>
                                 <path d="M15 7h6v6"></path>
-                            </svg>
-                            Sustainability
-                        </span>
-                        <span style="display: flex; align-items: center; color: var(--accent); font-weight: 600;">
-                            <svg class="icon" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 24 24">
+                            </svg> Sustainability</span>
+                        <span style="display: flex; align-items: center; color: var(--accent); font-weight: 600;"><svg
+                                class="icon" style="width: 20px; height: 20px; margin-right: 8px;" viewBox="0 0 24 24">
                                 <path d="M5 12h13M12 5l7 7-7 7"></path>
-                            </svg>
-                            Empowerment
-                        </span>
+                            </svg> Empowerment</span>
                     </div>
                 </div>
                 <div class="animate-up delay-3" style="margin-top: 50px;">
                     <button class="nav-btn" onclick="location.reload()"
-                        style="width: auto; padding: 0 40px; border-radius: 40px; font-weight: bold; letter-spacing: 1px;">
-                        RESTART
-                    </button>
+                        style="width: auto; padding: 0 40px; border-radius: 40px; font-weight: bold; letter-spacing: 1px;">RESTART</button>
                 </div>
             </div>
         </div>
@@ -1014,16 +966,13 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
 
-        let isAnimating = false; // Debounce flag
+        let isAnimating = false;
 
-        // Loader Logic
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
-            // Ensure first slide is set up before hiding loader
             updateUI();
             setTimeout(() => {
                 loader.style.opacity = '0';
-                // Remove from DOM slightly after opacity transition
                 setTimeout(() => { loader.style.display = 'none'; }, 600);
             }, 500);
         });
@@ -1037,12 +986,10 @@
                 }
             });
 
-            // Progress Bar
             const progress = ((currentSlide + 1) / slides.length) * 100;
             progressFill.style.width = `${progress}%`;
             currentSlideNum.innerText = `0${currentSlide + 1}`;
 
-            // Button State
             prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
             prevBtn.style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
 
@@ -1052,7 +999,6 @@
         }
 
         function changeSlide(direction) {
-            // Prevent rapid clicking
             if (isAnimating) return;
 
             if (direction === 1 && currentSlide < slides.length - 1) {
@@ -1060,19 +1006,17 @@
             } else if (direction === -1 && currentSlide > 0) {
                 currentSlide--;
             } else {
-                return; // No change
+                return;
             }
 
             isAnimating = true;
             updateUI();
 
-            // Reset animation flag after transition completes
             setTimeout(() => {
                 isAnimating = false;
-            }, 800); // Matches CSS transition time
+            }, 600);
         }
 
-        // Keyboard Controls
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
                 changeSlide(1);
